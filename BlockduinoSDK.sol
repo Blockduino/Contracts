@@ -111,7 +111,8 @@ contract usingBlockduinoSDK {
 		int reply = 1;
 
 		// send a transaction to the Blockduino core contract calling the Blockduino.request() function
-        reply = CONTRACT.request.gas(1000000)(this, callbackFID, _method, _device, _paramsIntegers, _paramsBytes);
+        // reply = CONTRACT.request.gas(1000000)(this, callbackFID, _method, _device, _paramsIntegers, _paramsBytes);
+        reply = CONTRACT.request.gas(BD_MINFEE)(this, callbackFID, _method, _device, _paramsIntegers, _paramsBytes);
 
         if (reply <= 0) {
  			// let the caller issue a refund when appropriate
