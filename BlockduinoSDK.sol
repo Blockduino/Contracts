@@ -1,12 +1,13 @@
 /*
- * Blockduino SDK.
- *
  * Copyright (C) 2018, Visible Energy Inc. and the Blockduino contributors.
- *
  */
 pragma solidity ^0.4.24;
 
-// declaration of symbols to use in the application using the SDK
+/// @title Blockduino SDK 
+/// @notice The contract with the functions to interact with Blockduino boards
+/// @dev Communication off-chain with the board is through the Blockduino core contract
+
+// declarations of public core contract functions used by the SDK
 contract Blockduino {
 	function request(address callbackAddr, bytes4 callbackFID, uint8 _method, address _device, uint8[2] _paramsIntegers, bytes32 _paramsBytes) public payable returns (int);
 	function getDevice(address _addr) external constant returns (address, address, bool, bytes32);
@@ -18,11 +19,8 @@ contract usingBlockduinoSDK {
 
     // -- START ------ RaspberryHAL
     //
-    /* pin numbering mnemonics using BCM mode 
-     * symbols will have the numeric value of the mnemonic
-     *
-     * TODO: will have to change into Dpin to allow for Apin enum
-     */
+    /// @devel pin numbering mnemonics using BCM mode 
+    /// symbols will have the numeric value of the mnemonic
     enum pin {
     	D0, // pin 27 (ID_SD)
     	D1, // pin 28 (ID_SC)
@@ -59,21 +57,22 @@ contract usingBlockduinoSDK {
     uint8 constant OUTPUT = 2;
     uint8 constant INPUT_PULLUP = 3;
     uint8 constant INPUT_PULLDOWN = 4;
+    /* digital pins state values */
+    uint8 constant LOW = 0;
+    uint8  HIGH = 1;
     
     //
     // -- END ------ RaspberryHAL
     
-    /* digital pins state values */
-    uint8 constant LOW = 0;
-    uint8  HIGH = 1;
+    /// @dev This contract is never deployed by itself but is always the base contract of an application
+    /// @param bcCont the Blockduino core contract address
+    /// @param owner the owner of the derived contract
 	constructor (address bcCont, address owner) public {
-		contract_owner = owner;     // application contract owner
+		contract_owner = owner;
 		CONTRACT = Blockduino(bcCont);
 	}
 
-	/*
-	* RPC method names and numbering.
-	*/
+	// RPC method names and numbering
 	uint8 constant BD_pinMode = 1;
 	uint8 constant BD_digitalRead = 2;
 	uint8 constant BD_digitalWrite = 3;
@@ -81,16 +80,21 @@ contract usingBlockduinoSDK {
 	uint8 constant BD_serialRead = 5;
 	uint8 constant BD_serialWrite = 6;
 
-   	uint constant MIN_GAS = 30000 + 20000; // minimum gas required for a RPC
+    // minimum gas required for a RPC
+   	uint constant MIN_GAS = 30000 + 20000;
     uint constant GAS_PRICE = 4 * 10 ** 10;
     uint constant BD_MINFEE = MIN_GAS * GAS_PRICE;
 
+    // the FID of a null callback
     bytes4 constant CB_NULL = '0x0';
 
+    /// @dev modifier to restrict use of a function to the device owner
+    /// @param _addr is the Blockduino device address
     modifier onlyByDeviceOwner(address _addr) {
         address device_owner;
         bool restricted;
-
+        
+        // obtain device details from the core contract
  		(,device_owner, restricted,) = CONTRACT.getDevice(_addr);
 
  		if (restricted) {
@@ -99,19 +103,15 @@ contract usingBlockduinoSDK {
     	_;
     }
 
-    // event to log the application request to the Blockduino contract
+    // event used for tracing the SDK request to the Blockduino contract
 	event BlockduinoSDK(uint8 _method, address _device, uint8[2] _paramsIntegers, bytes32 _paramsBytes);
 
- 	/*
- 	 * Record and log the RPC request to a device.
- 	 */
+ 	/// @dev propagate a RPC request to the core contract and log it for tracing
 	function request(bytes4 callbackFID, uint8 _method, address _device, uint8[2] _paramsIntegers, bytes32 _paramsBytes) private returns(int) {
 		int reply = 1;
 
-		// send a transaction to the Blockduino contract calling the Blockduino.request() function
-		// msg.value received by this application contract is sent to the Blockduino contract 
-		// (minus the gas paid so far?)
-        reply = CONTRACT.request.value(msg.value).gas(1000000)(this, callbackFID, _method, _device, _paramsIntegers, _paramsBytes);
+		// send a transaction to the Blockduino core contract calling the Blockduino.request() function
+        reply = CONTRACT.request(this, callbackFID, _method, _device, _paramsIntegers, _paramsBytes);
 
         if (reply <= 0) {
  			// let the caller issue a refund when appropriate
@@ -123,10 +123,12 @@ contract usingBlockduinoSDK {
 		emit BlockduinoSDK(_method, _device, _paramsIntegers, _paramsBytes);
 		return reply;
 	}
-
-	/*
-	 * Set a GPIO pin mode.
-	 */
+    
+	/// @dev Set a GPIO pin mode
+	/// @param _device the Blockduino device address
+	/// @param _pin affected GPIO pin
+	/// @param _mode new mode
+	/// @param callbackFID the callback function ID
 	function pinMode(address _device, pin _pin, uint8 _mode, bytes4 callbackFID) public payable onlyByDeviceOwner(_device) returns(int) {
 		bytes32 rpc_params_bytes = '0x0';
 		uint8[2] memory rpc_params_int;
@@ -140,9 +142,10 @@ contract usingBlockduinoSDK {
 	    return reply;
 	}
 
-	/*
-	 * Read the state of a digital pin. 
-	 */
+	/// @dev Read the state of a digital pin
+	/// @param _device the Blockduino device address
+	/// @param _pin GPIO pin to read
+	/// @param callbackFID the callback function ID	 
 	function digitalRead(address _device, pin _pin, bytes4 callbackFID) public payable onlyByDeviceOwner(_device) returns(int) {
 		bytes32 rpc_params_bytes = '0x0';
 		uint8[2] memory rpc_params_int;
@@ -155,9 +158,11 @@ contract usingBlockduinoSDK {
 		return reply;
 	}
 
-	/*
-	 * Write the state of a digital pin. 
-	 */
+	/// @dev  Write the state of a digital pin
+	/// @param _device the Blockduino device address
+	/// @param _pin GPIO pin to write
+	/// @param _state the new state for the pin
+	/// @param callbackFID the callback function ID	 
 	function digitalWrite(address _device, pin _pin, uint8 _state, bytes4 callbackFID) public payable onlyByDeviceOwner(_device) returns(int) {
 		bytes32 rpc_params_bytes = '0x0';
 		uint8[2] memory rpc_params_int;
@@ -171,9 +176,10 @@ contract usingBlockduinoSDK {
 		return reply;
 	}
 
-	/*
-	 * Toggle the state of a digital pin. 
-	 */
+	/// @dev Toggle the state of a digital pin
+	/// @param _device the Blockduino device address
+	/// @param _pin GPIO pin to toggle
+	/// @param callbackFID the callback function ID	
 	function pinToggle(address _device, pin _pin, bytes4 callbackFID) public payable onlyByDeviceOwner(_device) returns(int) {
 		bytes32 rpc_params_bytes = '0x0';
 		uint8[2] memory rpc_params_int;
@@ -186,9 +192,10 @@ contract usingBlockduinoSDK {
 		return reply;
 	}
 	
-	/*
-	 * Read a single bytes32 buffer from the serial port.
-	 */
+	/// @dev Read a single bytes32 buffer from the serial port
+	/// @param _device the Blockduino device address
+	/// @param _maxbytes number of bytes to read
+	/// @param callbackFID the callback function ID	
 	 function serialRead(address _device, uint8 _maxbytes, bytes4 callbackFID) public payable onlyByDeviceOwner(_device) returns(int) {
  		bytes32 rpc_params_bytes = '0x0';
 		uint8[2] memory rpc_params_int;
@@ -201,9 +208,11 @@ contract usingBlockduinoSDK {
 		return reply;       
 	 }
 	 
-	/*
-	 * Write bytes from a single bytes32 buffer to the serial port.
-	 */
+	/// @dev Write bytes from a single bytes32 buffer to the serial port
+	/// @param _device the Blockduino device address
+	/// @param _numbytes number of bytes to write
+	/// @param _buffer the buffer to write
+	/// @param callbackFID the callback function ID		 
 	 function serialWrite(address _device, uint8 _numbytes, bytes32 _buffer, bytes4 callbackFID) public payable onlyByDeviceOwner(_device) returns(int) {
  		bytes32 rpc_params_bytes = _buffer;
 		uint8[2] memory rpc_params_int;
