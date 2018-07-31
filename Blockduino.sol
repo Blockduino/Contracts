@@ -1,4 +1,7 @@
 /*
+ * Copyright (C) 2018, Visible Energy Inc. and the Blockduino contributors.
+ */
+ /*
  * Blockduino core contract.
  *
  * Copyright (C) 2018, Visible Energy Inc. and the Blockduino contributors.
@@ -7,6 +10,9 @@
 
 pragma solidity ^0.4.24;
 
+/// @title Blockduino core contract 
+/// @notice Centralized management and command dispatch for deviceAddresses
+/// @dev Manage communication to and from devices for RPC
 contract Blockduino {
 	// Blockduino device
 	struct Device {	// data structure for devices
@@ -22,15 +28,16 @@ contract Blockduino {
 	address[] public deviceAddresses;		// used to export the devices addresses
 	// TODO: make the array private and of size [2**64]? that is address[2**64] -- change way using from .push to [x]
 
+	// event to log adding a new device from a dApp
 	event NewDevice(address indexed owner, address id);
 
 	/*--*/
     struct Request { // data structure for each request
-        address requester; 	// the address of the requester
-        uint fee; 			// the amount of wei the requester pays for the request
-        address callbackAddr; // the address of the contract to call for delivering response
-        bytes4 callbackFID; // the specification of the callback function
-        address device;	// device the request is directed to
+        address requester; 		// the address of the requester
+        uint fee; 				// the amount of wei the requester pays for the request
+        address callbackAddr; 	// the address of the contract to call for delivering response
+        bytes4 callbackFID; 	// the specification of the callback function
+        address device;			// device the request is directed to
     }
 
 	int public constant FAIL_FLAG = -2 ** 250;
@@ -43,7 +50,7 @@ contract Blockduino {
     bytes4 constant TC_CALLBACK_FID = bytes4(sha3("response(uint64,uint64,bytes32)"));
 
 	/* ------------------------------------------------------------- */
-
+    /// @dev modifier to restrict use of a function to the contract owner
     modifier onlyByContractOwner() {	// only by contract owner
         require(msg.sender == owner, "Sender not authorized.");
         _;
