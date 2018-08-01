@@ -9,6 +9,119 @@ The main dispatcher for sending instructions and commands to devices off-chain. 
 
 The high-level functions to interact with a Blockduino board and devices connected to it from a Solidity contract.
 
+* [General Purpose IO Pins](#gpio-functions)
+* [Serial Port and USB](#serial-port-and-usb)
+* [I2C Bus](#i2c-bus)
+* [DAC Pins](#dac-pins)
+* [SPI Interface](#spi-interface)
+* [CAN Bus](#can-bus)
+* [Pins Naming](#pins-naming)
+
+### GPIO Functions
+
+```
+pinMode(address _device, pin _pin, uint8 _mode, bytes4 callbackFID)
+```
+Set a GPIO pin mode.
+
+| PARAMETER        | DESCRIPTION                      | TYPE                            |
+|------------------|----------------------------------|-------------------------------------
+| `_device` | the Blockduino device address          | address |
+| `_pin` | affected GPIO pin           | pin |
+| `_mode` | new mode | uint |
+| `callbackFID` | the callback function ID | bytes4 |
+
+| RETURN     | TYPE  
+| -------------------------|-------------------------------------
+| request ID | int
+
+```
+digitalRead(address _device, pin _pin, bytes4 callbackFID)
+```
+Read the state of a digital pin.
+
+| PARAMETER        | DESCRIPTION                      | TYPE                            |
+|------------------|----------------------------------|-------------------------------------
+| `_device` | the Blockduino device address          | address |
+| `_pin` |  GPIO pin to read          | pin |
+| `callbackFID` | the callback function ID | bytes4 |
+
+| RETURN     | TYPE  
+| -------------------------|-------------------------------------
+| request ID | int
+
+```
+digitalWrite(address _device, pin _pin, uint8 _state, bytes4 callbackFID)
+```
+Write the state of a digital pin.
+
+| PARAMETER        | DESCRIPTION                      | TYPE                            |
+|------------------|----------------------------------|-------------------------------------
+| `_device` | the Blockduino device address          | address |
+| `_pin` |  GPIO pin to write          | pin |
+| `_state` | new state | uint8 |
+| `callbackFID` | the callback function ID | bytes4 |
+
+| RETURN     | TYPE  
+| -------------------------|-------------------------------------
+| request ID | int
+
+```
+pinToggle(address _device, pin _pin, bytes4 callbackFID)
+```
+Toggle the state of a digital pin.
+
+| PARAMETER        | DESCRIPTION                      | TYPE                            |
+|------------------|----------------------------------|-------------------------------------
+| `_device` | the Blockduino device address          | address |
+| `_pin` |  GPIO pin to toggle          | pin |
+| `callbackFID` | the callback function ID | bytes4 |
+
+| RETURN     | TYPE  
+| -------------------------|-------------------------------------
+| request ID | int
+
+
+### Serial Port and USB
+```
+serialRead(address _device, uint8 _maxbytes, bytes4 callbackFID)
+```
+Read a single bytes32 buffer from the serial port.
+
+| PARAMETER        | DESCRIPTION                      | TYPE                            |
+|------------------|----------------------------------|-------------------------------------
+| `_device` | the Blockduino device address          | address |
+| `_maxbytes` |  number of bytes to read (<= 32)        | uint8 |
+| `callbackFID` | the callback function ID | bytes4 |
+
+| RETURN     | TYPE  
+| -------------------------|-------------------------------------
+| request ID | int
+
+```
+serialWrite(address _device, uint8 _numbytes, bytes32 _buffer, bytes4 callbackFID)
+```
+Write bytes from a single bytes32 buffer to the serial port.
+
+| PARAMETER        | DESCRIPTION                      | TYPE                            |
+|------------------|----------------------------------|-------------------------------------
+| `_device` | the Blockduino device address          | address |
+| `_maxbytes` |  number of bytes to write (<= 32)        | uint8 |
+| `_buffer` |  buffer to write         | bytes32 |
+| `callbackFID` | the callback function ID | bytes4 |
+
+| RETURN     | TYPE  
+| -------------------------|-------------------------------------
+| request ID | int
+
+### I2C Bus
+
+### DAC Pins
+
+### SPI Interface
+
+### CAN Bus
+
 ### Pins Naming
 
 Pins have mnemonic names used in the GPIO functions.
@@ -45,22 +158,3 @@ Pins have mnemonic names used in the GPIO functions.
 |    	D25 | pin 22 |
 |    	D26 | pin 37 |
 |    	D27 | pin 13 |
-
-### GPIO Functions
-
-```
-pinMode(address _device, pin _pin, uint8 _mode, bytes4 callbackFID)
-```
-Set a GPIO pin mode.
-
-| PARAMETER        | DESCRIPTION                      | TYPE                            |
-|------------------|----------------------------------|-------------------------------------
-| `_device` | the Blockduino device address          | address |
-| `_pin` | affected GPIO pin           | pin |
-| `_mode` | new mode | uint |
-| `callbackFID` | the callback function ID | bytes4 |
-
-
-| RETURN     | TYPE  
-| -------------------------|-------------------------------------
-| new mode | int
