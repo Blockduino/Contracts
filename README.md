@@ -5,6 +5,8 @@
 
 The main dispatcher for sending instructions and commands to devices off-chain. It is also the centralized management system for Blockduino devices.
 
+[Getting Started with Blockduino](https://github.com/Blockduino/Blockduino/blob/master/Getting Started.md)
+
 [Blockduino SDK](https://github.com/Blockduino/Contracts/blob/master/BlockduinoSDK.sol)
 
 The high-level functions to interact with a Blockduino board and devices connected to it from a Solidity contract.
