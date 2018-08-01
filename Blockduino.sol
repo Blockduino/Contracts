@@ -56,9 +56,8 @@ contract Blockduino {
         _;
     }
 
-    /*
-     * Convert a string to bytes32 for internal storage.
-     */
+    /// @dev Convert a string to bytes32 for internal storage
+    /// @param source string to convert
     function stringToBytes32(string memory source) private pure returns (bytes32 result) {
     	//bytes memory tempEmptyStringTest = bytes(source);
     	//if (tempEmptyStringTest.length == 0) {
@@ -69,9 +68,8 @@ contract Blockduino {
     	assembly { result := mload(add(source, 32)) }
     }
 
-    /*
-     * Check if an address is a contract.
-     */
+     /// @dev Check if an address is a contract
+     /// @param addr address to check
 	function isContract(address addr) private view returns (bool) {
 	  uint size;
 	  assembly { size := extcodesize(addr) }
@@ -92,9 +90,11 @@ contract Blockduino {
 	// fallback to receive ether
 	function () public {}
 
-	/*
-	 * Add a new device to the table of registered devices.
-	 */
+	/// @dev Add a new device to the table of registered devices
+	/// @param _id device Ethereum address 
+	/// @param _restricted permission flag
+	/// @param _mac_s device MAC address
+	/// @param _activaction_key_s a string containing the activation key
 	function addDevice(				// Blockduino
 		address _id, 				// public ethereum address
 		bool _restricted,			// permission flag
@@ -118,23 +118,21 @@ contract Blockduino {
 		emit NewDevice(msg.sender, _id);
 	}
 
-	/*
-	 * Functions to access registered devices.
-	 */
+	/// @dev Functions to access registered devices
 	 function deviceAddressesCount() external constant returns (uint) {
 	 	return deviceAddresses.length;
 	 }
-
+	  
 	 function getDeviceAddress(uint _index) external constant returns (address) {
 	 	return deviceAddresses[_index];
 	 }
-
+	  
 	 function getDevice(address _addr) external constant returns (address, address, bool, bytes32) {
 		require(devices[_addr].owner != address(0), "Device not registered or deleted.");
 
 	 	return (devices[_addr].id,  devices[_addr].owner, devices[_addr].restricted, devices[_addr].mac);
 	 }
-
+	  
 	 function removeDevice(address _addr) external onlyByContractOwner() returns (address) {
 	 	require(devices[_addr].owner != address(0), "Device not registered or deleted.");
 
@@ -151,18 +149,17 @@ contract Blockduino {
 
  	/* ------------------------------------------------------------- */
 
-    // event to log the application request
+    // event to log the external contract request
 	event RPCRequest(uint64 requestID, uint8 method, address indexed device, uint8[2] paramsIntegers, bytes32 paramsBytes);
 
-	/*
-	 * Propagate an RPC request received from the Blockduino SDK.
-	 *
-	 *  @callbackAddr the address of the contract issuing the request, used in the response.
-	 *  @_method the RPC method number of the request to send to the Blockduino board.
-	 *  @_ device the Blockduino device Ethereum address
-	 *  @_paramsIntegers the integer array data required in the RPC.
-	 *  @_paramsBytes the bytes array data required in the RPC.
-	 */
+	
+	/// @notice Propagate an RPC request received from the Blockduino SDK.
+	/// @param callbackAddr the address of the contract issuing the request, used in the response.
+    /// @param callbackFID function ID of the external contract callback
+	/// @param _method the RPC method number of the request to send to the Blockduino board.
+	/// @param _device the Blockduino device Ethereum address
+	/// @param _paramsIntegers the integer array data required in the RPC.
+	/// @param _paramsBytes the bytes array data required in the RPC.
  	function request(address callbackAddr, bytes4 callbackFID, uint8 _method, address _device, uint8[2] _paramsIntegers, bytes32 _paramsBytes) public payable returns (int) {
  		uint64 requestID = requestCnt;
 
@@ -192,12 +189,8 @@ contract Blockduino {
  		return requestID;
  	}
 
- 	/*
- 	 * After sending the RPC request to a Blockduino board that generate a response the Blockduino or the relay server
- 	 * sends the response in a transaction calling this function.
- 	 *
- 	 * 
- 	 */
+ 	/// @dev After sending the RPC request to a Blockduino board that generate a response 
+ 	/// the Blockduino sends the response in a transaction calling this function.
  	function response(uint64 requestID, uint64 error, bytes32 respData) public {
  		if (msg.sender != requests[requestID].device ||
  			requests[requestID].requester == address(0)) {
