@@ -1,5 +1,6 @@
 # Contracts
 
+### Index
 [Blockduino core contract](https://github.com/Blockduino/Contracts/blob/master/Blockduino.sol)
 
 The main dispatcher for sending instructions and commands to devices off-chain. It is also the centralized management system for Blockduino devices.
@@ -8,7 +9,7 @@ The main dispatcher for sending instructions and commands to devices off-chain. 
 
 The high-level functions to interact with a Blockduino board and devices connected to it from a Solidity contract.
 
-#### Pins Naming
+### Pins Naming
 
 Pins have mnemonic names used in the GPIO functions.
 
@@ -45,7 +46,7 @@ Pins have mnemonic names used in the GPIO functions.
 |    	D26 | pin 37 |
 |    	D27 | pin 13 |
 
-#### GPIO Functions
+### GPIO Functions
 
 ```
 pinMode(address _device, pin _pin, uint8 _mode, bytes4 callbackFID)
