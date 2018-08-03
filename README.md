@@ -5,6 +5,8 @@
 
 The main dispatcher for sending instructions and commands to devices off-chain. It is also the centralized management system for Blockduino devices.
 
+`Ropsten address: 0xC859B2826d7c39a5CcA1F651c053523b45AbA64f`
+
 [Getting Started with Blockduino](https://github.com/Blockduino/Blockduino/blob/master/Getting Started.md)
 
 [Blockduino SDK](https://github.com/Blockduino/Contracts/blob/master/BlockduinoSDK.sol)
