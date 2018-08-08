@@ -19,6 +19,7 @@ The high-level functions to interact with a Blockduino board and devices connect
 * [DAC Pins](#dac-pins)
 * [SPI Interface](#spi-interface)
 * [CAN Bus](#can-bus)
+* [Triggers](#triggers)
 * [Pins Naming](#pins-naming)
 
 ### GPIO Functions
@@ -125,6 +126,12 @@ Write bytes from a single bytes32 buffer to the serial port.
 ### SPI Interface
 
 ### CAN Bus
+
+### Triggers
+Triggers are based on interrupts or values of GPIO pins and other interfaces. Once a trigger is set, a one-way transaction to the application smart-contract is initiated by the board upon trigger occurence. 
+
+> Since triggers needs gas, there are limits to the number of triggers a Blockduino can handle. A portion of the funds in the Blockduino wallet are dedicated to triggers.
+
 
 ### Pins Naming
 
