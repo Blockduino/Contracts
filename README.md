@@ -7,7 +7,7 @@ The main dispatcher for sending instructions and commands to devices off-chain. 
 
 `Ropsten address: 0xC859B2826d7c39a5CcA1F651c053523b45AbA64f`
 
-[Getting Started with Blockduino](https://github.com/Blockduino/Blockduino/blob/master/Getting Started.md)
+[Getting Started with Blockduino](https://github.com/Blockduino/Blockduino/blob/master/GettingStarted.md)
 
 [Blockduino SDK](https://github.com/Blockduino/Contracts/blob/master/BlockduinoSDK.sol)
 
